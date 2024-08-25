@@ -18,7 +18,7 @@ export default function GetProductTest() {
         try {
             const res = await axios.get("/productlist");
             setProductData(res.data);
-            console.log(res.data)
+            // console.log(res.data)
 
         } catch (error) {
             setIsError(error);
@@ -48,16 +48,9 @@ export default function GetProductTest() {
   const ButtonStyle = {
       height: "60px"
   }
-  let DataNum = ProductData.length
-  console.log(DataNum)
+  // let DataNum = ProductData.length
+  // console.log(DataNum)
 
-  // let carts = document.querySelectorAll('.add-cart')
-  // console.log(carts.length)
-  // for(let i=0;i <carts.length;i++){
-  //   carts[i].addEventListener('click',() => {
-  //     cartNumbers(ProductData[i])
-  //   })
-  // }
 
   function cartNumbers(product) {
     let productNumbers = localStorage.getItem('cartItems');
@@ -102,32 +95,35 @@ export default function GetProductTest() {
       product.discounted_price = parseFloat(product.discounted_price)
       localStorage.setItem('totalCost',cartCost + product.discounted_price)
     }else{
+      cartCost = parseFloat(cartCost)
       product.discounted_price = parseFloat(product.discounted_price)
       localStorage.setItem('totalCost', product.discounted_price)
     }
+
+    cartCost = localStorage.getItem('totalCost');  
     console.log("The Cart Cost is ", cartCost)
 
   }
-const AddCart = (product) => {
 
-  let productDetails = {
-    product: {
-      title: product.product_title,
-      image: product.product_image,
-      description: product.product_description,
-      selling_price: product.selling_price,
-      discounted_price: product.discounted_price,
-      quantity: product.quantity,
+  const AddCart = (product) => {
+
+    let productDetails = {
+      product: {
+        title: product.product_title,
+        image: product.product_image,
+        description: product.product_description,
+        selling_price: product.selling_price,
+        discounted_price: product.discounted_price,
+      }
     }
+
+    // Output the object to the console
+    console.log(productDetails);
+
+    cartNumbers(product); 
+    totalCost(product);
+    // Pass the productDetails object to cartNumbers
   }
-
-  // Output the object to the console
-  console.log(productDetails);
-
-  cartNumbers(product); 
-  totalCost(product);
-  // Pass the productDetails object to cartNumbers
-}
 
 
 

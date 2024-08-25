@@ -1,68 +1,77 @@
 from rest_framework import serializers
 
-from Todo.models import MyUser, task, ProductList,Orders,OrderProduct
+from Todo.models import MyUser, ProductList,OrderList
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
+
 
 
 
 #Custom Serializer
 
 class UserSerializer(serializers.ModelSerializer):
-
+    email = serializers.EmailField(max_length = 255)
+    profile_pic = serializers.ImageField(
+        required = False,
+        error_messages={
+            'invalid_image': 'The uploaded file is not a valid image.',
+        }
+    ) 
+    password1 = serializers.CharField(style={'input_type':'password'},write_only=True)
     password2 = serializers.CharField(style={'input_type':'password'},write_only=True)
     class Meta:
-        model = MyUser 
-        fields = ["id","email","firstName","lastName","password","password2"]
+        model = MyUser
+        fields = ['id','first_name', 'last_name', 'email', 'phone_number','password1','password2','profile_pic']
         extra_kwargs = {
             'password':{'write_only':True}
         }
 
+
     def validate(self,attrs):
-        password = attrs.get('password')
+        password1 = attrs.get('password1')
         password2 = attrs.get('password2')
 
-        if password != password2:
+        if password1 != password2:
             raise serializers.ValidationError("Password doesn't match ")
         
         return attrs
+
+    def create(self,validated_attrs):
+        password = validated_attrs.pop('password1')
+        validated_attrs.pop('password2')
+        user = MyUser.objects.create_user(password=password, **validated_attrs)
+        return user
     
-    def create(self, validate_data):
-        return MyUser.objects.create_user(**validate_data)
-    
 
-#Task Serializer
 
-class TaskSerializer(serializers.ModelSerializer):
+class LoginSerializer(serializers.Serializer):
+    email = serializers.EmailField(max_length=255)
+    password = serializers.CharField(style={'input_type': 'password'}, write_only=True)
 
-    class Meta:
-        model = task
-        fields = ["id","user","title","description","due_date","Completed"]
-        
 
-class LoginSerializer(serializers.ModelSerializer):
-    email = serializers.EmailField(max_length = 255)
-    class Meta:
-        model = MyUser
-        fields = ["email","password"]
 
+class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
+    @classmethod
+    def get_token(cls, user):
+        token = super().get_token(user)
+
+        # Add custom claims
+        token['username'] = user.first_name +' '+ user.last_name
+        token['Phone Number'] = user.phone_number
+
+        return token
 
 
 class ProductSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = ProductList
-        fields = ["id", "product_title","product_description","selling_price","discounted_price","category","quantity","product_image"]
+        fields = ["id", "product_title","product_description","selling_price","discounted_price","category","product_image"]
 
-class OrderProductSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = OrderProduct
-        fields = ['product', 'quantity']
+
 
 class OrdersSerializer(serializers.ModelSerializer):
-    order_products = OrderProductSerializer(many=True, read_only=True)
 
     class Meta:
-        model = Orders
-        fields = ["id", "order_products", "address", "GrandTotal"]
+        model = OrderList
+        fields = ["id", "order_id","ordered_at", "Delivery_destination","product_details", "GrandTotal","user"]
 
-
-    

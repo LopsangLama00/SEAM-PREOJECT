@@ -57,7 +57,6 @@ export default function AddProduct() {
         formData.append("selling_price", values.selling_price);
         formData.append("discounted_price", values.discounted_price);
         formData.append("category", values.category);
-        formData.append("quantity", values.quantity);
         formData.append("product_image", values.product_image);
         if (values.product_title === "") { 
           SetError((prev) =>{
@@ -96,14 +95,6 @@ export default function AddProduct() {
             return {
               ...prev,
               category: "Category must be Selected"
-            }
-          })
-        }
-        else if(values.quantity === ""){
-          SetProductDetails((prev) =>{
-            return {
-              ...prev,
-              quantity: "1"
             }
           })
         }
@@ -200,11 +191,6 @@ navigate("/")
                 
                 </Form.Control >
                 <p className="text-danger" >{error.category}</p>
-            </Form.Group>
-            <Form.Group controlId="quantity" className="mb-3">
-                <Form.Label >Quantity of Product</Form.Label>
-                <Form.Control type="number" name="quantity"  onChange={handleChange} value={ProductDetails.quantity}/>
-                <p className="text-danger" >{error.quantity} </p>
             </Form.Group>
             <Form.Group controlId="product_image" className="mb-3">
                 <Form.Label >Product Image</Form.Label>

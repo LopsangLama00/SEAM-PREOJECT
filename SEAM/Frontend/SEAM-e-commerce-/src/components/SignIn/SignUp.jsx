@@ -94,13 +94,14 @@ function Register() {
             navigate("/")
           },1000)
         }).catch ((error) => {
-        
         console.log(error.message)
         if(error.response.status == 400 ){
           toast.error("Bad Request")
+          console.log(error.res)
         }
         else if(error.response.status == 500){
           toast.error("Something went wrong")
+          console.log(error.message)
         }
         
       })
